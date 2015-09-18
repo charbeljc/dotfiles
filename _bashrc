@@ -42,6 +42,7 @@ esac
 # This may well be the case for some other terms, so I'm putting them here.
 # Also set up a variable to indicate whether to set up the title functions.
 # TODO gnome-terminal, or however it reports itself
+echo "TERM:" $TERM
 case $TERM in
 
   screen)
@@ -121,7 +122,7 @@ fi
 # Set $TERM for libvte terminals that set $TERM wrong (like gnome-terminal)
 {
   [ "_$TERM" = "_xterm" ] && type ldd && type grep && type tput && [ -L "/proc/$PPID/exe" ] && {
-    if ldd /proc/$PPID/exe | grep libvte; then
+  if ldd /proc/$PPID/exe | grep 'lib\(vte\|qtermwidget5\|python\)'; then
       if [ "`tput -Txterm-256color colors`" = "256" ]; then
         TERM=xterm-256color
       elif [ "`tput -Txterm-256color colors`" = "256" ]; then
@@ -129,7 +130,12 @@ fi
       elif tput -T xterm; then
         TERM=xterm
       fi
-    fi
+  elif ls -l /proc/$PPID/exe | grep python ; then
+      if [ "`tput -Txterm-256color colors`" = "256" ]; then
+          TERM=xterm-256color
+      fi
+  fi
+
   }
 } >/dev/null 2>/dev/null
 
@@ -138,7 +144,7 @@ if [ "$venwrap" != "" ]; then
     source $venwrap
 fi
 
-alias vim="emacs"
+# alias vim="emacs"
 
 PYTHONSTARTUP=~/.pythonrc.py
 export PYTHONSTARTUP

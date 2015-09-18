@@ -2,11 +2,14 @@
 function link_file {
     source="${PWD}/$1"
     target="${HOME}/${1/_/.}"
-
+    echo "source" $source
+    echo "target" $target
     if [ -e "${target}" ] && [ ! -L "${target}" ]; then
+        echo "mv $target $target.df.bak"
         mv $target $target.df.bak
     fi
 
+    echo "ln -sf ${source} ${target}"
     ln -sf ${source} ${target}
 }
 
@@ -20,23 +23,22 @@ function unlink_file {
     fi
 }
 
-if [ "$1" = "vim" ]; then
-    for i in _vim*
-    do
-       link_file $i
-    done
-elif [ "$1" = "restore" ]; then
+if [ "$1" = "restore" ]; then
     for i in _*
     do
         unlink_file $i
     done
     exit
-else
-    for i in _*
+elif [ "$1" == "update" ]; then
+    git submodule update --init --recursive
+    git submodule foreach --recursive git pull origin master    
+elif [ -e "$1" ]; then
+    echo "installing $1 ..."
+    for i in ${1}*
     do
         link_file $i
     done
+else
+    echo "hu?", $1
 fi
 
-git submodule update --init --recursive
-git submodule foreach --recursive git pull origin master

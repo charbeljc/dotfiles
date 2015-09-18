@@ -52,6 +52,13 @@
 set nocompatible              " Don't be compatible with vi
 let mapleader=","             " change the leader to be a comma vs slash
 
+
+set rtp+=/usr/local/lib/python2.7/dist-packages/powerline/bindings/vim
+
+python from powerline.vim import setup as powerline_setup
+python powerline_setup()
+python del powerline_setup
+
 " Seriously, guys. It's not like :W is bound to anything anyway.
 command! W :w
 
@@ -146,7 +153,7 @@ set background=dark           " We are using dark background in vim
 set title                     " show title in console title bar
 set wildmenu                  " Menu completion in command mode on <Tab>
 set wildmode=full             " <Tab> cycles between all matching choices.
-
+set mouse=a                   " Cats love mouses
 " don't bell or blink
 set noerrorbells
 set vb t_vb=
