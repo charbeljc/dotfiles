@@ -13,12 +13,38 @@ from libqtile import layout, bar, widget, hook
 import os
 import pyosd
 OSD = None
+_line = -1
+class OSDLog:
+    def __init__(self, lines):
+        self._lc = lines
+        self._lines = []
+        self._osd = pyosd.osd(font=pyosd.default_font.replace('360', '180'),
+                        pos=pyosd.POS_BOT,
+                        offset=100,
+                        hoffset=100,
+                        lines=self._lc)
+
+
+    def announce(self, msg):
+        if len(self._lines) == self._lc:
+            self._lines = self._lines[1:]
+        self._lines.append(msg)
+        self.redisplay()
+
+    def redisplay(self):
+        for i, msg in enumerate(self._lines):
+            self._osd.display(msg, line=i)
 
 def announce(*msgs):
-    global OSD
+    global OSD, _line
     if not OSD:
-        OSD = pyosd.osd()
-    OSD.display('\n'.join(msgs))
+        OSD = pyosd.osd(font=pyosd.default_font.replace('360', '180'),
+                        pos=pyosd.POS_BOT,
+                        offset=100,
+                        hoffset=100,
+                        lines=4)
+    _line = (_line + 1) % 4
+    OSD.display('\n'.join(msgs), line=_line)
 
 
 def find_window(name, cli=None):
@@ -183,16 +209,16 @@ keys = setup_key_bindings(groups)
 layouts = [
     layout.MonadTall(),
     layout.Max(),
-    layout.TreeTab(sections=['Work', 'Messaging', 'Docs', 'Util', 'Other']),
-    # a layout for pidgin
-    layout.Slice('right', 256, name='pidgin', role='buddy_list',
-         fallback=layout.Stack(stacks=2, border_width=1)),
-    layout.Tile(ratio=0.35, borderwidth=1),
-    layout.VerticalTile(),
-    layout.Matrix(),
-    layout.RatioTile(),
-    layout.Zoomy(),
-    layout.Floating(),
+    # layout.TreeTab(sections=['Work', 'Messaging', 'Docs', 'Util', 'Other']),
+    ## a layout for pidgin
+    # layout.Slice('right', 256, name='pidgin', role='buddy_list',
+    #      fallback=layout.Stack(stacks=2, border_width=1)),
+    # layout.Tile(ratio=0.35, borderwidth=1),
+    # layout.VerticalTile(),
+    # layout.Matrix(),
+    # layout.RatioTile(),
+    # layout.Zoomy(),
+    # layout.Floating(),
     ]
 
 screens = [
@@ -238,9 +264,82 @@ def qtile_config(window):
 
 @hook.subscribe.startup
 def coucou():
-    _logger.info('QTile startup hook')
+    announce('QTile startup hook')
     
-#@hook.subscribe.startup
+@hook.subscribe.startup_once
+def startup_once_hook(*args, **kwargs):
+    announce('QTile startup Once\nargs=%r, kw=%r\n' % (args, kwargs))
+
+@hook.subscribe.addgroup
+def addgroup_hook(*args, **kwargs):
+    announce('addgroup:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.setgroup
+def setgroup_hook(*args, **kwargs):
+    announce('setgroup:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.delgroup
+def delgroup_hook(*args, **kwargs):
+    announce('delgroup:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.changegroup
+def changegroup_hook(*args, **kwargs):
+    announce('changegroup:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.focus_change
+def focus_change_hook():
+    announce('focus_change')
+@hook.subscribe.float_change
+def startup_once_hook(*args, **kwargs):
+    announce('float_change:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.group_window_add
+def startup_once_hook(*args, **kwargs):
+    announce('group_window_add:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.window_name_change
+def startup_once_hook(*args, **kwargs):
+    # announce('window_name_change:\nargs=%r, kw=%r\n' % (args, kwargs))
+    pass
+@hook.subscribe.client_new
+def startup_once_hook(*args, **kwargs):
+    announce('client_new:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.client_managed
+def startup_once_hook(*args, **kwargs):
+    announce('client_managed:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.client_killed
+def startup_once_hook(*args, **kwargs):
+    announce('client_killed:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.client_state_changed
+def startup_once_hook(*args, **kwargs):
+    announce('client_state_changed:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.client_type_changed
+def startup_once_hook(*args, **kwargs):
+    announce('client_type_changed:\nargs=%r, kw=%r\n' % (args, kwargs))
+
+@hook.subscribe.client_focus
+def client_focus_hook(window):
+    announce('client_focus: %s %s' % (window.name, window.window))
+
+@hook.subscribe.client_mouse_enter
+def startup_once_hook(*args, **kwargs):
+    announce('client_mouse_enter:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.client_name_updated
+def startup_once_hook(*args, **kwargs):
+    announce('client_name_updated:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.client_urgent_hint_changed
+def startup_once_hook(*args, **kwargs):
+    announce('client_urgent_hint_changed:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.layout_change
+def startup_once_hook(*args, **kwargs):
+    announce('layout_change:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.net_wm_icon_change
+def startup_once_hook(*args, **kwargs):
+    announce('net_wm_icon_change:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.selection_notify
+def startup_once_hook(*args, **kwargs):
+    announce('selection_notify:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.selection_change
+def startup_once_hook(*args, **kwargs):
+    announce('selection_change:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.screen_change
+def startup_once_hook(*args, **kwargs):
+    announce('screen_change:\nargs=%r, kw=%r\n' % (args, kwargs))
+#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@hook.subscribe.startup
 #def dbus_register():
 #        x = os.environ['DESKTOP_AUTOSTART_ID']
 #        subprocess.Popen(['dbus-send',
@@ -261,8 +360,10 @@ def french():
 
 @hook.subscribe.client_new
 def dialogs(window):
+    announce('client_type: %s' % window.window.get_wm_type())
     if(window.window.get_wm_type() == 'dialog'
-        or window.window.get_wm_transient_for()):
+        or window.window.get_wm_transient_for()
+        or window.name == 'Terminator Preferences'):
         window.floating = True
 
 main = None
