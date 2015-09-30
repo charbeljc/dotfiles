@@ -67,3 +67,5 @@ URxvt.color14:          cyan1
 !URxvt.color4:          SteelBlue2
 !URxvt.color12:         SteelBlue1
 !URxvt.color6:          cyan1
+
+Xcursor.theme: mate

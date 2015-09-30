@@ -1,6 +1,6 @@
 [user]
-    name = John Anderson
-    email = sontek@gmail.com
+    name = Charbel Jacquin
+    email = charbel.jacquin@camptocamp.com
 
 [color]
     diff = auto
@@ -9,7 +9,7 @@
     ui = auto
 
 [push]
-    default = matching
+    default = simple 
 
 [core]
     editor = emacs

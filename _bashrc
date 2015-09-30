@@ -121,7 +121,7 @@ fi
 # Set $TERM for libvte terminals that set $TERM wrong (like gnome-terminal)
 {
   [ "_$TERM" = "_xterm" ] && type ldd && type grep && type tput && [ -L "/proc/$PPID/exe" ] && {
-    if ldd /proc/$PPID/exe | grep libvte; then
+  if ldd /proc/$PPID/exe | grep 'lib\(vte\|qtermwidget5\|python\)'; then
       if [ "`tput -Txterm-256color colors`" = "256" ]; then
         TERM=xterm-256color
       elif [ "`tput -Txterm-256color colors`" = "256" ]; then
@@ -129,7 +129,12 @@ fi
       elif tput -T xterm; then
         TERM=xterm
       fi
-    fi
+  elif ls -l /proc/$PPID/exe | grep python ; then
+      if [ "`tput -Txterm-256color colors`" = "256" ]; then
+          TERM=xterm-256color
+      fi
+  fi
+
   }
 } >/dev/null 2>/dev/null
 
@@ -138,7 +143,7 @@ if [ "$venwrap" != "" ]; then
     source $venwrap
 fi
 
-alias vim="emacs"
+# alias vim="emacs"
 
 PYTHONSTARTUP=~/.pythonrc.py
 export PYTHONSTARTUP
@@ -157,8 +162,8 @@ parse_svn_repository_root() {
   svn info 2>/dev/null | sed -ne 's#^Repository Root: ##p'
 }
 set -o vi
-export EDITOR="emacs"
-export GIT_EDITOR="emacs"
+export EDITOR="vi"
+export GIT_EDITOR="vi"
 
 # Add git and svn branch names
 export PS1="$PS1\$(parse_git_branch)\$(parse_svn_branch) "
