@@ -42,7 +42,6 @@ esac
 # This may well be the case for some other terms, so I'm putting them here.
 # Also set up a variable to indicate whether to set up the title functions.
 # TODO gnome-terminal, or however it reports itself
-echo "TERM:" $TERM
 case $TERM in
 
   screen)
@@ -52,7 +51,7 @@ case $TERM in
     TERM_CAN_TITLE=true
   ;;
 
-  xterm-color|color_xterm|rxvt|Eterm|screen*) # screen.linux|screen-w
+  xterm-color|xterm-256color|color_xterm|rxvt|Eterm|screen*) # screen.linux|screen-w
     TERM_IS_COLOR=true
     TERM_NOT_RECOGNIZED_AS_COLOR_BY_VIM=false
     TERM_NOT_RECOGNIZED_BY_SUN_UTILS=true
@@ -139,12 +138,16 @@ fi
   }
 } >/dev/null 2>/dev/null
 
+
+# Python dev setup
 venwrap=`type -P virtualenvwrapper.sh`
 if [ "$venwrap" != "" ]; then
     source $venwrap
 fi
 
-# alias vim="emacs"
+# fighting RSI, switching to vi, twenty (!) years later.
+alias emacs=vim
+alias vi=vim
 
 PYTHONSTARTUP=~/.pythonrc.py
 export PYTHONSTARTUP
@@ -163,8 +166,8 @@ parse_svn_repository_root() {
   svn info 2>/dev/null | sed -ne 's#^Repository Root: ##p'
 }
 set -o vi
-export EDITOR="emacs"
-export GIT_EDITOR="emacs"
+export EDITOR="vim"
+export GIT_EDITOR="vim"
 
 # Add git and svn branch names
 export PS1="$PS1\$(parse_git_branch)\$(parse_svn_branch) "
@@ -190,3 +193,21 @@ _complete_hosts () {
 
 complete -F _complete_hosts ssh
 complete -F _complete_hosts host
+
+# SSH agent setup
+# see: http://www.electricmonk.nl/log/2012/04/24/re-use-existing-ssh-agent-cygwin-et-al/
+# If no SSH agent is already running, start one now. Re-use sockets so we never
+# have to start more than one session.
+
+export SSH_AUTH_SOCK=${HOME}/.ssh-socket
+
+ssh-add -l >/dev/null 2>&1
+if [ $? = 2 ]; then
+   # No ssh-agent running
+   rm -rf $SSH_AUTH_SOCK
+   # >| allows output redirection to over-write files if no clobber is set
+   ssh-agent -a $SSH_AUTH_SOCK >| /tmp/.ssh-script
+   source /tmp/.ssh-script
+   echo $SSH_AGENT_PID >| ~/.ssh-agent-pid
+   rm /tmp/.ssh-script
+fi

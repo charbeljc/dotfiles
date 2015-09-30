@@ -6,11 +6,11 @@ function link_file {
     echo "target" $target
     if [ -e "${target}" ] && [ ! -L "${target}" ]; then
         echo "mv $target $target.df.bak"
-        mv $target $target.df.bak
+        mv "$target" "$target.df.bak"
     fi
 
     echo "ln -sf ${source} ${target}"
-    ln -sf ${source} ${target}
+    ln -sf "${source}" "${target}"
 }
 
 function unlink_file {
@@ -18,8 +18,8 @@ function unlink_file {
     target="${HOME}/${1/_/.}"
 
     if [ -e "${target}.df.bak" ] && [ -L "${target}" ]; then
-        unlink ${target}
-        mv $target.df.bak $target
+        unlink "${target}"
+        mv "$target.df.bak" "$target"
     fi
 }
 

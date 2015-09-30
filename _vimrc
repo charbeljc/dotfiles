@@ -49,16 +49,14 @@
 " ==========================================================
 " Shortcuts
 " ==========================================================
+set mouse=a                   " Cats love mouses
 set nocompatible              " Don't be compatible with vi
 let mapleader=","             " change the leader to be a comma vs slash
 
-
-set rtp+=/usr/local/lib/python2.7/dist-packages/powerline/bindings/vim
-
-python from powerline.vim import setup as powerline_setup
-python powerline_setup()
-python del powerline_setup
-
+" Airline is cool
+set encoding=utf-8
+set noshowmode
+let g:airline_powerline_fonts = 1
 " Seriously, guys. It's not like :W is bound to anything anyway.
 command! W :w
 
@@ -153,7 +151,6 @@ set background=dark           " We are using dark background in vim
 set title                     " show title in console title bar
 set wildmenu                  " Menu completion in command mode on <Tab>
 set wildmode=full             " <Tab> cycles between all matching choices.
-set mouse=a                   " Cats love mouses
 " don't bell or blink
 set noerrorbells
 set vb t_vb=
@@ -314,3 +311,48 @@ endif
 if exists("&colorcolumn")
    set colorcolumn=79
 endif
+
+" Vim on cygwin / mintty
+" see: http://vim.wikia.com/wiki/Using_the_Windows_clipboard_in_Cygwin_Vim
+" paste first
+function! Getclip()
+    let reg_save = @@
+    "let @@ = system('getclip')
+    "  Much like Putclip(), using the /dev/clipboard device to access to
+    "  the native Windows clipboard for Cygwin 1.7.13 and above. It
+    "  provides the added benefit of supporting utf-8 characters which getclip
+    "  currently does not. Based again on a tip from John Beckett, use the
+    "  following:
+    let @@ = join(readfile('/dev/clipboard'), "\n")
+    setlocal paste
+    exe 'normal p'
+    setlocal nopaste
+    let @@ = reg_save
+endfunction
+
+nnoremap <silent> <leader>p : call Getclip()<CR>
+
+" then copy
+function! Putclip(type, ...) range
+  let sel_save = &selection
+  let &selection = "inclusive"
+  let reg_save = @@
+  if a:type == 'n'
+    silent exe a:firstline . "," . a:lastline . "y"
+  elseif a:type == 'c'
+    silent exe a:1 . "," . a:2 . "y"
+  else
+    silent exe "normal! `<" . a:type . "`>y"
+  endif
+  "call system('putclip', @@)
+  "As of Cygwin 1.7.13, the /dev/clipboard device was added to provide
+  "access to the native Windows clipboard. It provides the added benefit
+  "of supporting utf-8 characters which putclip currently does not. Based
+  "on a tip from John Beckett, use the following:
+  call writefile(split(@@,"\n"), '/dev/clipboard')
+  let &selection = sel_save
+  let @@ = reg_save
+endfunction
+
+vnoremap <silent> <leader>y :call Putclip(visualmode(), 1)<CR>
+nnoremap <silent> <leader>y :call Putclip('n', 1)<CR>

@@ -238,9 +238,80 @@ def qtile_config(window):
 
 @hook.subscribe.startup
 def coucou():
-    _logger.info('QTile startup hook')
+    announce('QTile startup hook')
     
-#@hook.subscribe.startup
+@hook.subscribe.startup_once
+def startup_once_hook(*args, **kwargs):
+    announce('QTile startup Once\nargs=%r, kw=%r\n' % (args, kwargs))
+
+@hook.subscribe.addgroup
+def addgroup_hook(*args, **kwargs):
+    announce('addgroup:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.setgroup
+def setgroup_hook(*args, **kwargs):
+    announce('setgroup:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.delgroup
+def startup_once_hook(*args, **kwargs):
+    announce('delgroup:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.changegroup
+def startup_once_hook(*args, **kwargs):
+    announce('changegroup:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.focus_change
+def startup_once_hook(*args, **kwargs):
+    announce('focus_change:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.float_change
+def startup_once_hook(*args, **kwargs):
+    announce('float_change:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.group_window_add
+def startup_once_hook(*args, **kwargs):
+    announce('group_window_add:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.window_name_change
+def startup_once_hook(*args, **kwargs):
+    # announce('window_name_change:\nargs=%r, kw=%r\n' % (args, kwargs))
+    pass
+@hook.subscribe.client_new
+def startup_once_hook(*args, **kwargs):
+    announce('client_new:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.client_managed
+def startup_once_hook(*args, **kwargs):
+    announce('client_managed:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.client_killed
+def startup_once_hook(*args, **kwargs):
+    announce('client_killed:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.client_state_changed
+def startup_once_hook(*args, **kwargs):
+    announce('client_state_changed:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.client_type_changed
+def startup_once_hook(*args, **kwargs):
+    announce('client_type_changed:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.client_focus
+def startup_once_hook(*args, **kwargs):
+    announce('client_focus:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.client_mouse_enter
+def startup_once_hook(*args, **kwargs):
+    announce('client_mouse_enter:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.client_name_updated
+def startup_once_hook(*args, **kwargs):
+    announce('client_name_updated:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.client_urgent_hint_changed
+def startup_once_hook(*args, **kwargs):
+    announce('client_urgent_hint_changed:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.layout_change
+def startup_once_hook(*args, **kwargs):
+    announce('layout_change:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.net_wm_icon_change
+def startup_once_hook(*args, **kwargs):
+    announce('net_wm_icon_change:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.selection_notify
+def startup_once_hook(*args, **kwargs):
+    announce('selection_notify:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.selection_change
+def startup_once_hook(*args, **kwargs):
+    announce('selection_change:\nargs=%r, kw=%r\n' % (args, kwargs))
+@hook.subscribe.screen_change
+def startup_once_hook(*args, **kwargs):
+    announce('screen_change:\nargs=%r, kw=%r\n' % (args, kwargs))
+#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@hook.subscribe.startup
 #def dbus_register():
 #        x = os.environ['DESKTOP_AUTOSTART_ID']
 #        subprocess.Popen(['dbus-send',
@@ -261,6 +332,7 @@ def french():
 
 @hook.subscribe.client_new
 def dialogs(window):
+    announce('client_type: %s' % window.window.get_wm_type())
     if(window.window.get_wm_type() == 'dialog'
         or window.window.get_wm_transient_for()):
         window.floating = True
